@@ -1,5 +1,5 @@
 # PHP-only-HR-Admin-Panel
-**Add/remove/edit employees, set/edit salaries, set roles, etc.**
+**Add/remove/edit employees, set/edit salaries, manage departments, set roles, etc.**
 
 <br />
 
