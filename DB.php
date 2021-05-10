@@ -7,6 +7,7 @@ class DB{
     private static $username = "";
     private static $password = "";
     private static $dbname = "";
+    
     protected static $conn;
     
     public function __construct(){
@@ -19,11 +20,9 @@ class DB{
             // die("Connection failed: ". $conn->connect_error);
             throw new Exception(self::$conn->connect_error);
         }
-
         
 		// SET CHARSET TO UTF-8
 		self::$conn->set_charset("utf8mb4");
-        
     }
     
     
@@ -238,7 +237,34 @@ class DB{
     
     
     
-    
+   public function editDepartmentEmployee(Employee $employeeObj){
+
+        if ( isset($employeeObj) && !empty($employeeObj) ) {
+            $employeeID = $employeeObj->getEmployeeNumber();
+            $newDepartmentNumber = $employeeObj->getDepartment();
+            $newRole = $employeeObj->getRole();
+            
+            $old_employee_data = $this->getEmployee($employeeID);
+            // echo '<pre>' . var_dump($old_employee_data) . '</pre>';
+            // echo '<pre>' . var_export($old_employee_data[0], true) . '</pre>';
+            
+            // If the department number has been edited, then change it in the DB
+            if ($old_employee_data[0]->getDepartment() != $newDepartmentNumber || $old_employee_data[0]->getRole() != $newRole)
+            {
+                $sql_delete = "DELETE FROM dept_emp WHERE emp_no = '".$employeeID."' ";
+                self::$conn->query($sql_delete);
+                
+                $sql_delete2 = "DELETE FROM dept_manager WHERE emp_no = '".$employeeID."' ";
+                self::$conn->query($sql_delete2);
+
+                if($employeeObj->getRole() == "manager")
+                {
+                    $this->addDepartmentManager($employeeObj, $employeeID);
+                }
+                else $this->addDepartmentEmployee($employeeObj, $employeeID);
+            }
+        }
+    }//end editDepartmentEmployee()
     
     
     public function editEmployee($employeeObj){
@@ -259,6 +285,9 @@ class DB{
         
         
         if (self::$conn->query($sql) === TRUE) {
+            
+            $this->editDepartmentEmployee($employeeObj);
+
             // echo "Employee's data edits have been applied to the database.";
         } else {
             // echo "Error: " . $sql . "\n" . self::$conn->error;

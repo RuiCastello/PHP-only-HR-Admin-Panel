@@ -214,7 +214,6 @@ if ( (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) )
         // echo "<pre> Dump da variável \$newEmployee : ";
         // var_dump($newEmployee);
         // echo "</pre>";
-        echo "<p style=\"color:red; text-align:center;\">Added a new employee!</p>";
         
         
         if ($editSent && !empty($employeeID) ){
@@ -230,11 +229,13 @@ if ( (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) )
 
 
           $DB->editEmployee($newEmployee);
+          echo "<p style=\"color:red; text-align:center;\">Employee data has been edited.</p>";
         }
         else{
           // Adiciona um empregado e devolve o last id
           $employeeId = $DB->addEmployee($newEmployee);
           if (isset($employeeId) && $employeeId >= 0) $newEmployee->setEmployeeNumber($employeeId);
+          echo "<p style=\"color:red; text-align:center;\">Added a new employee!</p>";
         }
        
         
@@ -253,7 +254,10 @@ if ( (!empty($_SESSION['logged_in']) && $_SESSION['logged_in'] == true) )
               $name = basename($_FILES["ccFile"]["name"][$key]);
               $extension = pathinfo($_FILES['ccFile']["name"][$key], PATHINFO_EXTENSION);
               $destinationPath = "data/".$employeeId.".".$extension;
-              $fileWasUploadedSucessfully = move_uploaded_file($tmp_name, $destinationPath);
+
+              if ($extension=="jpg" OR $extension=="jpeg" OR $extension=="gif" OR $extension=="png" OR $extension=="pdf" OR $extension=="doc" OR $extension=="docx") {
+                $fileWasUploadedSucessfully = move_uploaded_file($tmp_name, $destinationPath);
+              }
               
               // ADICIONA path para o ficheiro $ccFile na coluna "cc" do respectivo employee
               if ($fileWasUploadedSucessfully) {
